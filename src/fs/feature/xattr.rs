@@ -259,10 +259,16 @@ mod lister {
                 FollowSymlinks::No   => llistxattr,
             };
 
+            #[cfg(not(target_arch = "aarch64"))]
+            let c_list = buf.as_mut_ptr().cast::<i8>();
+
+            #[cfg(target_arch = "aarch64")]
+            let c_list = buf.as_mut_ptr().cast::<u8>();
+
             unsafe {
                 listxattr(
                     c_path.as_ptr().cast(),
-                    buf.as_mut_ptr().cast::<i8>(),
+                    c_list,
                     bufsize as size_t,
                 )
             }
@@ -274,10 +280,16 @@ mod lister {
                 FollowSymlinks::No   => lgetxattr,
             };
 
+            #[cfg(not(target_arch = "aarch64"))]
+            let c_list = buf.as_ptr().cast::<i8>();
+
+            #[cfg(target_arch = "aarch64")]
+            let c_list = buf.as_ptr().cast::<u8>();
+
             unsafe {
                 getxattr(
                     c_path.as_ptr().cast(),
-                    buf.as_ptr().cast::<i8>(),
+                    c_list,
                     ptr::null_mut(),
                     0,
                 )
